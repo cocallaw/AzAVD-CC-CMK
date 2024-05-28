@@ -44,6 +44,7 @@ param vmSize string = 'Standard_DC2as_v5'
 
 @description('OS Image for VMs to use')
 @allowed([
+  'Windows 11 Enterprise 23H2 Gen 2'
   'Windows Server 2022 Gen 2'
   'Windows Server 2019 Gen 2'
   'Ubuntu 20.04 LTS Gen 2'
@@ -84,6 +85,12 @@ var keyVaultName = 'AKV-${uniqueString(resourceGroup().id, timeUnique)}'
 var diskEncryptSetName = 'DES-01'
 var imageReference = imageList[osImageName]
 var imageList = {
+  'Windows 11 Enterprise 23H2 Gen 2': {
+    publisher: 'microsoftwindowsdesktop'
+    offer: 'windows-11'
+    sku: 'win11-23h2-ent'
+    version: 'latest'
+  }
   'Windows Server 2022 Gen 2': {
     publisher: 'microsoftwindowsserver'
     offer: 'windowsserver'
