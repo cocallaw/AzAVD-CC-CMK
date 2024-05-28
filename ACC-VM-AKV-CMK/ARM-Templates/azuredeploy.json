@@ -69,7 +69,7 @@
         },
         "osImageName": {
             "type": "string",
-            "defaultValue": "Windows Server 2022 Gen 2",
+            "defaultValue": "Windows 11 Enterprise 23H2 Gen 2",
             "allowedValues": [
                 "Windows 11 Enterprise 23H2 Gen 2",
                 "Windows Server 2022 Gen 2",

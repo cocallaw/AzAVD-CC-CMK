@@ -49,7 +49,7 @@ param vmSize string = 'Standard_DC2as_v5'
   'Windows Server 2019 Gen 2'
   'Ubuntu 20.04 LTS Gen 2'
 ])
-param osImageName string = 'Windows Server 2022 Gen 2'
+param osImageName string = 'Windows 11 Enterprise 23H2 Gen 2'
 
 @description('VM security type.')
 @allowed([
