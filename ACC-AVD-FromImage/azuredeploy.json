@@ -151,12 +151,14 @@
                         "deleteOption": "[parameters('osDiskDeleteOption')]"
                     },
                     "imageReference": {
-                        "id": "/subscriptions/e380d55c-263f-4af2-8587-0bdd61044290/resourceGroups/rg-xom-test-01/providers/Microsoft.Compute/galleries/cgxomlab01/images/win11-cc/versions/0.0.2"
+                        //TODO Change to Reference to the image
+                        "id": "/subscriptions/GUID/resourceGroups/rg-test-01/providers/Microsoft.Compute/galleries/cglab01/images/win11-cc/versions/0.0.2"
                     }
                 },
                 "networkProfile": {
                     "networkInterfaces": [
                         {
+                            //TODO Add Copy Loop Logic for proper NIC Refrence
                             "id": "[resourceId('Microsoft.Network/networkInterfaces', parameters('networkInterfaceName'))]",
                             "properties": {
                                 "deleteOption": "[parameters('nicDeleteOption')]"
@@ -194,6 +196,7 @@
             }
         },
         {
+            //TODO Add Copy Loop Logic
             "name": "[concat(parameters('virtualMachineName'),'/', variables('aadLoginExtensionName'))]",
             "type": "Microsoft.Compute/virtualMachines/extensions",
             "apiVersion": "2018-10-01",
@@ -208,9 +211,11 @@
                 }
             },
             "dependsOn": [
+                //TODO Verify Proper Dependency
                 "[concat('Microsoft.Compute/virtualMachines/', parameters('virtualMachineName'))]"
             ]
         }
+        //TODO add the AVD Host Pool Extension Logic
     ],
     "outputs": {
         "adminUsername": {
