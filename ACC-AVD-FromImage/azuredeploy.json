@@ -195,8 +195,11 @@
             }
         },
         {
-            //TODO Add Copy Loop Logic
-            "name": "[concat(parameters('virtualMachineName'),'/', variables('aadLoginExtensionName'))]",
+            "copy": {
+                "name": "AADLoginExtension-Loop",
+                "count": "[length(range(0, parameters('numberOfVMs')))]"
+            },
+            "name": "[concat(format('{0}-{1}', parameters('virtualMachineName'), range(0, parameters('numberOfVMs'))[copyIndex()]),'/', variables('aadLoginExtensionName'))]",
             "type": "Microsoft.Compute/virtualMachines/extensions",
             "apiVersion": "2018-10-01",
             "location": "[parameters('location')]",
