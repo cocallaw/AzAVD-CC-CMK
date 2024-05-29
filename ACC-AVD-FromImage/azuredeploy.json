@@ -210,8 +210,7 @@
                 }
             },
             "dependsOn": [
-                //TODO Verify Proper Dependency
-                "[concat('Microsoft.Compute/virtualMachines/', parameters('virtualMachineName'))]"
+                "VM-Loop"
             ]
         }
         //TODO add the AVD Host Pool Extension Logic
