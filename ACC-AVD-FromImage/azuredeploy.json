@@ -93,9 +93,16 @@
         "hostpoolName": {
             "type": "string"
         },
+        "hostpoolToken": {
+            "value": null
+        },
         "aadJoin": {
             "type": "bool",
             "value": true
+        },
+        "intune": {
+            "type": "bool",
+            "value": false
         },
         "systemData": {
             "type": "object",
@@ -253,7 +260,7 @@
             },
             "copy": {
                 "name": "VM-DSCLoop",
-                "count": "[parameters('rdshNumberOfInstances')]"
+                "count": "[parameters('numberOfVMs')]"
             }
         },
         {
@@ -278,7 +285,6 @@
                 "VM-DSCLoop"
             ]
         }
-        //TODO add the AVD Host Pool Extension Logic
     ],
     "outputs": {
         "adminUsername": {
