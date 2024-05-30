@@ -89,6 +89,28 @@
         },
         "vTPM": {
             "type": "bool"
+        },
+        "hostpoolName": {
+            "type": "string"
+        },
+        "aadJoin": {
+            "type": "bool",
+            "value": true
+        },
+        "systemData": {
+            "type": "object",
+            "value": {
+                "aadJoinPreview": false,
+                "sessionHostConfigurationVersion": "",
+                "firstPartyExtension": false
+            }
+        },
+        "sessionHostConfigurationVersion": {
+            "type": "string",
+            "value": ""
+        },
+        "artifactsLocation": {
+            "value": "https://wvdportalstorageblob.blob.core.windows.net/galleryartifacts/Configuration_1.0.02698.323.zip"
         }
     },
     "variables": {
@@ -195,6 +217,46 @@
             }
         },
         {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "apiVersion": "2021-07-01",
+            "name": "[concat(parameters('virtualMachineName'), add(copyindex(), parameters('numberOfVMs')), '/', 'Microsoft.PowerShell.DSC')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "rdsh-guest-attestation-loop"
+            ],
+            "properties": {
+                "publisher": "Microsoft.Powershell",
+                "type": "DSC",
+                "typeHandlerVersion": "2.73",
+                "autoUpgradeMinorVersion": true,
+                "settings": {
+                    "modulesUrl": "[parameters('artifactsLocation')]",
+                    "configurationFunction": "Configuration.ps1\\AddSessionHost",
+                    "properties": {
+                        "hostPoolName": "[parameters('hostpoolName')]",
+                        "registrationInfoTokenCredential": {
+                            "UserName": "PLACEHOLDER_DO_NOT_USE",
+                            "Password": "PrivateSettingsRef:RegistrationInfoToken"
+                        },
+                        "aadJoin": "[parameters('aadJoin')]",
+                        "UseAgentDownloadEndpoint": true,
+                        "aadJoinPreview": "[and(contains(parameters('systemData'), 'aadJoinPreview'), parameters('systemData').aadJoinPreview)]",
+                        "mdmId": "[if(parameters('intune'), '0000000a-0000-0000-c000-000000000000', '')]",
+                        "sessionHostConfigurationLastUpdateTime": "[parameters('SessionHostConfigurationVersion')]"
+                    }
+                },
+                "protectedSettings": {
+                    "Items": {
+                        "RegistrationInfoToken": "[parameters('hostpoolToken')]"
+                    }
+                }
+            },
+            "copy": {
+                "name": "VM-DSCLoop",
+                "count": "[parameters('rdshNumberOfInstances')]"
+            }
+        },
+        {
             "copy": {
                 "name": "AADLoginExtension-Loop",
                 "count": "[length(range(0, parameters('numberOfVMs')))]"
@@ -213,7 +275,7 @@
                 }
             },
             "dependsOn": [
-                "VM-Loop"
+                "VM-DSCLoop"
             ]
         }
         //TODO add the AVD Host Pool Extension Logic
