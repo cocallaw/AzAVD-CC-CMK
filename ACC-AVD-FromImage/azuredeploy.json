@@ -201,12 +201,12 @@
             },
             "name": "[concat(format('{0}-{1}', parameters('virtualMachineName'), range(0, parameters('numberOfVMs'))[copyIndex()]),'/', variables('aadLoginExtensionName'))]",
             "type": "Microsoft.Compute/virtualMachines/extensions",
-            "apiVersion": "2018-10-01",
+            "apiVersion": "2021-07-01",
             "location": "[parameters('location')]",
             "properties": {
                 "publisher": "Microsoft.Azure.ActiveDirectory",
-                "type": "[variables('aadLoginExtensionName')]",
-                "typeHandlerVersion": "1.0",
+                "type": "AADLoginForWindows",
+                "typeHandlerVersion": "2.0",
                 "autoUpgradeMinorVersion": true,
                 "settings": {
                     "mdmId": ""
