@@ -14,9 +14,6 @@
                 "description": "Number of VMs to deploy"
             }
         },
-        "networkInterfaceName": {
-            "type": "string"
-        },
         "virtualNetworkName": {
             "type": "string"
         },
