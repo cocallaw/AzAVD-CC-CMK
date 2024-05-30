@@ -31,12 +31,6 @@
         "virtualMachineName": {
             "type": "string"
         },
-        "virtualMachineComputerName": {
-            "type": "string"
-        },
-        "virtualMachineRG": {
-            "type": "string"
-        },
         "osDiskType": {
             "type": "string"
         },
@@ -71,10 +65,6 @@
         "nicDeleteOption": {
             "type": "string"
         },
-        "hibernationEnabled": {
-            "type": "bool",
-            "value": false
-        },
         "adminUsername": {
             "type": "string"
         },
@@ -90,48 +80,33 @@
         "securityType": {
             "type": "string"
         },
-        "secureBoot": {
-            "type": "bool"
-        },
-        "vTPM": {
-            "type": "bool"
-        },
-        "integrityMonitoring": {
-            "type": "bool",
-            "value": true
-        },
         "hostpoolName": {
             "type": "string"
         },
         "hostpoolToken": {
+            "defaultValue": null,
             "value": null
-        },
-        "aadJoin": {
-            "type": "bool",
-            "value": true
         },
         "intune": {
             "type": "bool",
+            "defaultValue": false,
             "value": false
-        },
-        "systemData": {
-            "type": "object",
-            "value": {
-                "aadJoinPreview": false,
-                "sessionHostConfigurationVersion": "",
-                "firstPartyExtension": false
-            }
         },
         "sessionHostConfigurationVersion": {
             "type": "string",
             "value": ""
-        },
-        "artifactsLocation": {
-            "value": "https://wvdportalstorageblob.blob.core.windows.net/galleryartifacts/Configuration_1.0.02698.323.zip"
         }
     },
     "variables": {
-        "aadLoginExtensionName": "AADLoginForWindows"
+        "aadLoginExtensionName": "AADLoginForWindows",
+        "artifactsLocation": "https://wvdportalstorageblob.blob.core.windows.net/galleryartifacts/Configuration_1.0.02698.323.zip",
+        "aadJoin" : true,
+        "systemData": {
+                "aadJoinPreview": false,
+                "sessionHostConfigurationVersion": "",
+                "firstPartyExtension": false
+            },
+        "sessionHostConfigurationVersion" : ""
     },
     "resources": [
         {
@@ -208,7 +183,7 @@
                     "hibernationEnabled": false
                 },
                 "osProfile": {
-                    "computerName": "[parameters('virtualMachineComputerName')]",
+                    "computerName": "[format('{0}-{1}', parameters('virtualMachineName'), range(0, parameters('numberOfVMs'))[copyIndex()])]",
                     "adminUsername": "[parameters('adminUsername')]",
                     "adminPassword": "[parameters('adminPassword')]",
                     "windowsConfiguration": {
@@ -224,8 +199,8 @@
                 "securityProfile": {
                     "securityType": "[parameters('securityType')]",
                     "uefiSettings": {
-                        "secureBootEnabled": "[parameters('secureBoot')]",
-                        "vTpmEnabled": "[parameters('vTPM')]"
+                        "secureBootEnabled": true,
+                        "vTpmEnabled": true
                     }
                 }
             },
@@ -264,8 +239,7 @@
             "copy": {
                 "name": "rdsh-guest-attestation-loop",
                 "count": "[parameters('numberOfVMs')]"
-            },
-            "condition": "[parameters('integrityMonitoring')]"
+            }
         },
         {
             "type": "Microsoft.Compute/virtualMachines/extensions",
@@ -281,7 +255,7 @@
                 "typeHandlerVersion": "2.73",
                 "autoUpgradeMinorVersion": true,
                 "settings": {
-                    "modulesUrl": "[parameters('artifactsLocation')]",
+                    "modulesUrl": "[variables('artifactsLocation')]",
                     "configurationFunction": "Configuration.ps1\\AddSessionHost",
                     "properties": {
                         "hostPoolName": "[parameters('hostpoolName')]",
@@ -289,11 +263,11 @@
                             "UserName": "PLACEHOLDER_DO_NOT_USE",
                             "Password": "PrivateSettingsRef:RegistrationInfoToken"
                         },
-                        "aadJoin": "[parameters('aadJoin')]",
+                        "aadJoin": "[variables('aadJoin')]",
                         "UseAgentDownloadEndpoint": true,
-                        "aadJoinPreview": "[and(contains(parameters('systemData'), 'aadJoinPreview'), parameters('systemData').aadJoinPreview)]",
+                        "aadJoinPreview": "[and(contains(variables('systemData'), 'aadJoinPreview'), variables('systemData').aadJoinPreview)]",
                         "mdmId": "[if(parameters('intune'), '0000000a-0000-0000-c000-000000000000', '')]",
-                        "sessionHostConfigurationLastUpdateTime": "[parameters('SessionHostConfigurationVersion')]"
+                        "sessionHostConfigurationLastUpdateTime": "[variables('SessionHostConfigurationVersion')]"
                     }
                 },
                 "protectedSettings": {
