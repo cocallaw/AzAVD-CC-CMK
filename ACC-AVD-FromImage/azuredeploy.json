@@ -88,6 +88,10 @@
         "vTPM": {
             "type": "bool"
         },
+        "integrityMonitoring": {
+            "type": "bool",
+            "value": true
+        },
         "hostpoolName": {
             "type": "string"
         },
@@ -220,6 +224,40 @@
             "identity": {
                 "type": "systemAssigned"
             }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "apiVersion": "2018-10-01",
+            "name": "[concat(parameters('virtualMachineName'), add(copyindex(), parameters('numberOfVMs')),'/GuestAttestation')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "VM-Loop"
+            ],
+            "properties": {
+                "publisher": "Microsoft.Azure.Security.WindowsAttestation",
+                "type": "GuestAttestation",
+                "typeHandlerVersion": "1.0",
+                "autoUpgradeMinorVersion": true,
+                "settings": {
+                    "AttestationConfig": {
+                        "MaaSettings": {
+                            "maaEndpoint": "",
+                            "maaTenantName": "GuestAttestation"
+                        },
+                        "AscSettings": {
+                            "ascReportingEndpoint": "",
+                            "ascReportingFrequency": ""
+                        },
+                        "useCustomToken": "false",
+                        "disableAlerts": "false"
+                    }
+                }
+            },
+            "copy": {
+                "name": "rdsh-guest-attestation-loop",
+                "count": "[parameters('numberOfVMs')]"
+            },
+            "condition": "[parameters('integrityMonitoring')]"
         },
         {
             "type": "Microsoft.Compute/virtualMachines/extensions",
