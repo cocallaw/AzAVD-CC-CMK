@@ -3,7 +3,15 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "location": {
-            "type": "string"
+            "type": "string",
+            "allowedValues": [
+                "EastUS",
+                "EastUS2",
+                "WestUS",
+                "IndiaSouth",
+                "IndiaWest",
+                "IndiaCentral"
+            ]
         },
         "numberOfVMs": {
             "type": "int",
