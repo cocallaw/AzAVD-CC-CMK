@@ -64,7 +64,8 @@
             "type": "string"
         },
         "hibernationEnabled": {
-            "type": "bool"
+            "type": "bool",
+            "value": false
         },
         "adminUsername": {
             "type": "string"
