@@ -51,42 +51,26 @@
         "adminPassword": {
             "type": "secureString"
         },
-        "patchMode": {
-            "type": "string"
-        },
-        "enableHotpatching": {
-            "type": "bool"
-        },
-        "securityType": {
-            "type": "string"
-        },
         "hostpoolName": {
             "type": "string"
         },
-        "hostpoolToken": {
-            "defaultValue": null,
-            "value": null
-        },
-        "intune": {
-            "type": "bool",
-            "defaultValue": false,
-            "value": false
+        "artifactsLocation" : {
+            "type": "string",
+            "defaultValue" : "https://wvdportalstorageblob.blob.core.windows.net/galleryartifacts/Configuration_1.0.02698.323.zip"
         }
     },
     "variables": {
-        "location": "[resourceGroup().location]",
         "osDiskType": "Standard_LRS",
-        "osDiskDeleteOption" : "Detach",
-        "nicDeleteOption" : "Detach",
+        "osDiskDeleteOption": "Detach",
+        "nicDeleteOption": "Detach",
+        "patchMode" : "AutomaticByOS",
         "aadLoginExtensionName": "AADLoginForWindows",
-        "artifactsLocation": "https://wvdportalstorageblob.blob.core.windows.net/galleryartifacts/Configuration_1.0.02698.323.zip",
-        "aadJoin" : true,
-        "systemData": {
-                "aadJoinPreview": false,
-                "sessionHostConfigurationVersion": "",
-                "firstPartyExtension": false
-            },
-        "sessionHostConfigurationVersion" : ""
+        "aadJoin": true,
+        "enableHotpatching": true,
+        "intune": false,
+        "securityType" : "ConfidentialVM",
+        "hostpoolToken": null,
+        "aadJoinPreview": false
     },
     "resources": [
         {
@@ -97,7 +81,7 @@
             "name": "[format('{0}-nic-{1}', parameters('virtualMachineName'), range(0, parameters('numberOfVMs'))[copyIndex()])]",
             "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "2022-11-01",
-            "location": "[variables('location')]",
+            "location": "[resourceGroup().location]",
             "dependsOn": [],
             "properties": {
                 "ipConfigurations": [
@@ -122,7 +106,7 @@
             "name": "[format('{0}-{1}', parameters('virtualMachineName'), range(0, parameters('numberOfVMs'))[copyIndex()])]",
             "type": "Microsoft.Compute/virtualMachines",
             "apiVersion": "2024-03-01",
-            "location": "[variables('location')]",
+            "location": "[resourceGroup().location]",
             "dependsOn": [
                 "NIC-Loop"
             ],
@@ -170,14 +154,14 @@
                         "enableAutomaticUpdates": true,
                         "provisionVmAgent": true,
                         "patchSettings": {
-                            "enableHotpatching": "[parameters('enableHotpatching')]",
-                            "patchMode": "[parameters('patchMode')]"
+                            "enableHotpatching": "[variables('enableHotpatching')]",
+                            "patchMode": "[variables('patchMode')]"
                         }
                     }
                 },
                 "licenseType": "Windows_Client",
                 "securityProfile": {
-                    "securityType": "[parameters('securityType')]",
+                    "securityType": "[variables('securityType')]",
                     "uefiSettings": {
                         "secureBootEnabled": true,
                         "vTpmEnabled": true
@@ -192,7 +176,7 @@
             "type": "Microsoft.Compute/virtualMachines/extensions",
             "apiVersion": "2018-10-01",
             "name": "[concat(parameters('virtualMachineName'), add(copyindex(), parameters('numberOfVMs')),'/GuestAttestation')]",
-            "location": "[variables('location')]",
+            "location": "[resourceGroup().location]",
             "dependsOn": [
                 "VM-Loop"
             ],
@@ -225,7 +209,7 @@
             "type": "Microsoft.Compute/virtualMachines/extensions",
             "apiVersion": "2021-07-01",
             "name": "[concat(parameters('virtualMachineName'), add(copyindex(), parameters('numberOfVMs')), '/', 'Microsoft.PowerShell.DSC')]",
-            "location": "[variables('location')]",
+            "location": "[resourceGroup().location]",
             "dependsOn": [
                 "rdsh-guest-attestation-loop"
             ],
@@ -235,7 +219,7 @@
                 "typeHandlerVersion": "2.73",
                 "autoUpgradeMinorVersion": true,
                 "settings": {
-                    "modulesUrl": "[variables('artifactsLocation')]",
+                    "modulesUrl": "[parameters('artifactsLocation')]",
                     "configurationFunction": "Configuration.ps1\\AddSessionHost",
                     "properties": {
                         "hostPoolName": "[parameters('hostpoolName')]",
@@ -245,14 +229,14 @@
                         },
                         "aadJoin": "[variables('aadJoin')]",
                         "UseAgentDownloadEndpoint": true,
-                        "aadJoinPreview": "[and(contains(variables('systemData'), 'aadJoinPreview'), variables('systemData').aadJoinPreview)]",
-                        "mdmId": "[if(parameters('intune'), '0000000a-0000-0000-c000-000000000000', '')]",
-                        "sessionHostConfigurationLastUpdateTime": "[variables('SessionHostConfigurationVersion')]"
+                        "aadJoinPreview": "[variables('aadJoinPreview')]",
+                        "mdmId": "[if(variables('intune'), '0000000a-0000-0000-c000-000000000000', '')]",
+                        "sessionHostConfigurationLastUpdateTime": ""
                     }
                 },
                 "protectedSettings": {
                     "Items": {
-                        "RegistrationInfoToken": "[parameters('hostpoolToken')]"
+                        "RegistrationInfoToken": "[variables('hostpoolToken')]"
                     }
                 }
             },
@@ -269,25 +253,18 @@
             "name": "[concat(format('{0}-{1}', parameters('virtualMachineName'), range(0, parameters('numberOfVMs'))[copyIndex()]),'/', variables('aadLoginExtensionName'))]",
             "type": "Microsoft.Compute/virtualMachines/extensions",
             "apiVersion": "2021-07-01",
-            "location": "[variables('location')]",
+            "location": "[resourceGroup().location]",
             "properties": {
                 "publisher": "Microsoft.Azure.ActiveDirectory",
                 "type": "AADLoginForWindows",
                 "typeHandlerVersion": "2.0",
                 "autoUpgradeMinorVersion": true,
-                "settings": {
-                    "mdmId": ""
-                }
+                "settings": {}
             },
             "dependsOn": [
                 "VM-DSCLoop"
             ]
         }
     ],
-    "outputs": {
-        "adminUsername": {
-            "type": "string",
-            "value": "[parameters('adminUsername')]"
-        }
-    }
+    "outputs": {}
 }
