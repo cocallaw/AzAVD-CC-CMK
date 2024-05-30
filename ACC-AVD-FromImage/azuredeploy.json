@@ -136,7 +136,7 @@
                     },
                     "imageReference": {
                         //TODO Change to Reference to the image
-                        "id": "/subscriptions/GUID/resourceGroups/rg-test-01/providers/Microsoft.Compute/galleries/cglab01/images/win11-cc/versions/0.0.2"
+                        "id": "/subscriptions/e380d55c-263f-4af2-8587-0bdd61044290/resourceGroups/rg-xom-test-01/providers/Microsoft.Compute/galleries/cgxomlab01/images/win11-cc/versions/0.0.2"
                     }
                 },
                 "networkProfile": {
@@ -181,7 +181,7 @@
         {
             "type": "Microsoft.Compute/virtualMachines/extensions",
             "apiVersion": "2018-10-01",
-            "name": "[concat(parameters('virtualMachineName'), add(copyindex(), parameters('numberOfVMs')),'/GuestAttestation')]",
+            "name": "[concat(format('{0}-{1}', parameters('virtualMachineName'), range(0, parameters('numberOfVMs'))[copyIndex()]),'/GuestAttestation')]",
             "location": "[resourceGroup().location]",
             "dependsOn": [
                 "VM-Loop"
@@ -214,7 +214,7 @@
         {
             "type": "Microsoft.Compute/virtualMachines/extensions",
             "apiVersion": "2021-07-01",
-            "name": "[concat(parameters('virtualMachineName'), add(copyindex(), parameters('numberOfVMs')), '/', 'Microsoft.PowerShell.DSC')]",
+            "name": "[concat(format('{0}-{1}', parameters('virtualMachineName'), range(0, parameters('numberOfVMs'))[copyIndex()]), '/', 'Microsoft.PowerShell.DSC')]",
             "location": "[resourceGroup().location]",
             "dependsOn": [
                 "rdsh-guest-attestation-loop"
