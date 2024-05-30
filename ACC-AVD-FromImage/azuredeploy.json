@@ -72,9 +72,8 @@
         "nicDeleteOption": "Detach",
         "patchMode" : "AutomaticByOS",
         "aadLoginExtensionName": "AADLoginForWindows",
-
         "aadJoin": true,
-        "enableHotpatching": true,
+        "enableHotpatching": false,
         "intune": false,
         "securityType" : "ConfidentialVM",
         "hostpoolToken": "",
