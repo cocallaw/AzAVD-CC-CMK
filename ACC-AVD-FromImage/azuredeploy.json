@@ -20,9 +20,6 @@
         "virtualMachineName": {
             "type": "string"
         },
-        "osDiskType": {
-            "type": "string"
-        },
         "confidentialDiskEncryptionSetId": {
             "type": "string"
         },
@@ -78,6 +75,7 @@
     },
     "variables": {
         "location": "[resourceGroup().location]",
+        "osDiskType": "Standard_LRS",
         "osDiskDeleteOption" : "Detach",
         "nicDeleteOption" : "Detach",
         "aadLoginExtensionName": "AADLoginForWindows",
@@ -136,7 +134,7 @@
                     "osDisk": {
                         "createOption": "fromImage",
                         "managedDisk": {
-                            "storageAccountType": "[parameters('osDiskType')]",
+                            "storageAccountType": "[variables('osDiskType')]",
                             "securityProfile": {
                                 "securityEncryptionType": "DiskWithVMGuestState",
                                 "diskEncryptionSet": {
@@ -144,7 +142,7 @@
                                 }
                             }
                         },
-                        "deleteOption": "[parameters('osDiskDeleteOption')]"
+                        "deleteOption": "[variables('osDiskDeleteOption')]"
                     },
                     "imageReference": {
                         //TODO Change to Reference to the image
@@ -156,7 +154,7 @@
                         {
                             "id": "[resourceId('Microsoft.Network/networkInterfaces', format('{0}-nic-{1}', parameters('virtualMachineName'), range(0, parameters('numberOfVMs'))[copyIndex()]))]",
                             "properties": {
-                                "deleteOption": "[parameters('nicDeleteOption')]"
+                                "deleteOption": "[variables('nicDeleteOption')]"
                             }
                         }
                     ]
