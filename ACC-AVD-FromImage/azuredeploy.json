@@ -11,6 +11,9 @@
                 "description": "Number of VMs to deploy"
             }
         },
+        "virtualNetworkRG": {
+            "type": "string"
+        },
         "virtualNetworkName": {
             "type": "string"
         },
@@ -54,6 +57,10 @@
         "hostpoolName": {
             "type": "string"
         },
+        "hostpoolToken": {
+            "type": "secureString",
+            "defaultValue": "PLACEHOLDER_DO_NOT_USE"
+        },
         "artifactsLocation" : {
             "type": "string",
             "defaultValue" : "https://wvdportalstorageblob.blob.core.windows.net/galleryartifacts/Configuration_1.0.02698.323.zip"
@@ -65,11 +72,12 @@
         "nicDeleteOption": "Detach",
         "patchMode" : "AutomaticByOS",
         "aadLoginExtensionName": "AADLoginForWindows",
+
         "aadJoin": true,
         "enableHotpatching": true,
         "intune": false,
         "securityType" : "ConfidentialVM",
-        "hostpoolToken": null,
+        "hostpoolToken": "",
         "aadJoinPreview": false
     },
     "resources": [
@@ -89,10 +97,9 @@
                         "name": "ipconfig1",
                         "properties": {
                             "subnet": {
-                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]"
+                                "id": "[resourceId(parameters('virtualNetworkRG'),'Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]"
                             },
-                            "privateIPAllocationMethod": "Dynamic",
-                            "publicIpAddress": {}
+                            "privateIPAllocationMethod": "Dynamic"
                         }
                     }
                 ]
@@ -236,7 +243,7 @@
                 },
                 "protectedSettings": {
                     "Items": {
-                        "RegistrationInfoToken": "[variables('hostpoolToken')]"
+                        "RegistrationInfoToken": "[parameters('hostpoolToken')]"
                     }
                 }
             },
