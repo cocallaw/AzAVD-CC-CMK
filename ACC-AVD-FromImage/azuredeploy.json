@@ -2,17 +2,6 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "location": {
-            "type": "string",
-            "allowedValues": [
-                "EastUS",
-                "EastUS2",
-                "WestUS",
-                "IndiaSouth",
-                "IndiaWest",
-                "IndiaCentral"
-            ]
-        },
         "numberOfVMs": {
             "type": "int",
             "defaultValue": 1,
@@ -37,9 +26,6 @@
         "confidentialDiskEncryptionSetId": {
             "type": "string"
         },
-        "osDiskDeleteOption": {
-            "type": "string"
-        },
         "virtualMachineSize": {
             "type": "string",
             "defaultValue": "Standard_DC2as_v5",
@@ -61,9 +47,6 @@
                 "Standard_DC64ads_v5",
                 "Standard_DC96ads_v5"
             ]
-        },
-        "nicDeleteOption": {
-            "type": "string"
         },
         "adminUsername": {
             "type": "string"
@@ -91,13 +74,12 @@
             "type": "bool",
             "defaultValue": false,
             "value": false
-        },
-        "sessionHostConfigurationVersion": {
-            "type": "string",
-            "value": ""
         }
     },
     "variables": {
+        "location": "[resourceGroup().location]",
+        "osDiskDeleteOption" : "Detach",
+        "nicDeleteOption" : "Detach",
         "aadLoginExtensionName": "AADLoginForWindows",
         "artifactsLocation": "https://wvdportalstorageblob.blob.core.windows.net/galleryartifacts/Configuration_1.0.02698.323.zip",
         "aadJoin" : true,
@@ -117,7 +99,7 @@
             "name": "[format('{0}-nic-{1}', parameters('virtualMachineName'), range(0, parameters('numberOfVMs'))[copyIndex()])]",
             "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "2022-11-01",
-            "location": "[parameters('location')]",
+            "location": "[variables('location')]",
             "dependsOn": [],
             "properties": {
                 "ipConfigurations": [
@@ -142,7 +124,7 @@
             "name": "[format('{0}-{1}', parameters('virtualMachineName'), range(0, parameters('numberOfVMs'))[copyIndex()])]",
             "type": "Microsoft.Compute/virtualMachines",
             "apiVersion": "2024-03-01",
-            "location": "[parameters('location')]",
+            "location": "[variables('location')]",
             "dependsOn": [
                 "NIC-Loop"
             ],
@@ -212,7 +194,7 @@
             "type": "Microsoft.Compute/virtualMachines/extensions",
             "apiVersion": "2018-10-01",
             "name": "[concat(parameters('virtualMachineName'), add(copyindex(), parameters('numberOfVMs')),'/GuestAttestation')]",
-            "location": "[parameters('location')]",
+            "location": "[variables('location')]",
             "dependsOn": [
                 "VM-Loop"
             ],
@@ -245,7 +227,7 @@
             "type": "Microsoft.Compute/virtualMachines/extensions",
             "apiVersion": "2021-07-01",
             "name": "[concat(parameters('virtualMachineName'), add(copyindex(), parameters('numberOfVMs')), '/', 'Microsoft.PowerShell.DSC')]",
-            "location": "[parameters('location')]",
+            "location": "[variables('location')]",
             "dependsOn": [
                 "rdsh-guest-attestation-loop"
             ],
@@ -289,7 +271,7 @@
             "name": "[concat(format('{0}-{1}', parameters('virtualMachineName'), range(0, parameters('numberOfVMs'))[copyIndex()]),'/', variables('aadLoginExtensionName'))]",
             "type": "Microsoft.Compute/virtualMachines/extensions",
             "apiVersion": "2021-07-01",
-            "location": "[parameters('location')]",
+            "location": "[variables('location')]",
             "properties": {
                 "publisher": "Microsoft.Azure.ActiveDirectory",
                 "type": "AADLoginForWindows",
