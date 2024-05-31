@@ -11,6 +11,9 @@
                 "description": "Number of VMs to deploy"
             }
         },
+        "virtualNetworkSubscriptionId": {
+            "type": "string"
+        },
         "virtualNetworkRG": {
             "type": "string"
         },
@@ -21,6 +24,9 @@
             "type": "string"
         },
         "virtualMachineName": {
+            "type": "string"
+        },
+        "virtualMachineImageResourceId": {
             "type": "string"
         },
         "confidentialDiskEncryptionSetId": {
@@ -94,8 +100,7 @@
                         "name": "ipconfig1",
                         "properties": {
                             "subnet": {
-                                //TODO Change to Reference to be cross Subscription Aware
-                                "id": "[resourceId(parameters('virtualNetworkRG'),'Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]"
+                                "id": "[resourceId(parameters('virtualNetworkSubscriptionId'),parameters('virtualNetworkRG'),'Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]"
                             },
                             "privateIPAllocationMethod": "Dynamic"
                         }
@@ -134,9 +139,7 @@
                         "deleteOption": "[variables('osDiskDeleteOption')]"
                     },
                     "imageReference": {
-                        //TODO Change to Reference to the image
-                        //TODO Change to be cross Subscription Aware
-                        "id": "/subscriptions/e380d55c-263f-4af2-8587-0bdd61044290/resourceGroups/rg-xom-test-01/providers/Microsoft.Compute/galleries/cgxomlab01/images/win11-cc/versions/0.0.2"
+                        "id": "[parameters('virtualMachineImageResourceId')]"
                     }
                 },
                 "networkProfile": {
@@ -207,7 +210,7 @@
                 }
             },
             "copy": {
-                "name": "rdsh-guest-attestation-loop",
+                "name": "VM-attestation-loop",
                 "count": "[parameters('numberOfVMs')]"
             }
         },
@@ -217,7 +220,7 @@
             "name": "[concat(format('{0}-{1}', parameters('virtualMachineName'), range(0, parameters('numberOfVMs'))[copyIndex()]), '/', 'Microsoft.PowerShell.DSC')]",
             "location": "[resourceGroup().location]",
             "dependsOn": [
-                "rdsh-guest-attestation-loop"
+                "VM-attestation-loop"
             ],
             "properties": {
                 "publisher": "Microsoft.Powershell",
