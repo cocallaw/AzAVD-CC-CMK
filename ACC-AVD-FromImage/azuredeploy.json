@@ -58,8 +58,7 @@
             "type": "string"
         },
         "hostpoolToken": {
-            "type": "secureString",
-            "defaultValue": "PLACEHOLDER_DO_NOT_USE"
+            "type": "secureString"
         },
         "artifactsLocation" : {
             "type": "string",
@@ -76,7 +75,6 @@
         "enableHotpatching": false,
         "intune": false,
         "securityType" : "ConfidentialVM",
-        "hostpoolToken": "",
         "aadJoinPreview": false
     },
     "resources": [
@@ -96,6 +94,7 @@
                         "name": "ipconfig1",
                         "properties": {
                             "subnet": {
+                                //TODO Change to Reference to be cross Subscription Aware
                                 "id": "[resourceId(parameters('virtualNetworkRG'),'Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]"
                             },
                             "privateIPAllocationMethod": "Dynamic"
@@ -136,6 +135,7 @@
                     },
                     "imageReference": {
                         //TODO Change to Reference to the image
+                        //TODO Change to be cross Subscription Aware
                         "id": "/subscriptions/e380d55c-263f-4af2-8587-0bdd61044290/resourceGroups/rg-xom-test-01/providers/Microsoft.Compute/galleries/cgxomlab01/images/win11-cc/versions/0.0.2"
                     }
                 },
@@ -265,7 +265,7 @@
                 "type": "AADLoginForWindows",
                 "typeHandlerVersion": "2.0",
                 "autoUpgradeMinorVersion": true,
-                "settings": {}
+                "settings": "[if(variables('intune'), createObject('mdmId','0000000a-0000-0000-c000-000000000000'), json('null'))]"
             },
             "dependsOn": [
                 "VM-DSCLoop"
