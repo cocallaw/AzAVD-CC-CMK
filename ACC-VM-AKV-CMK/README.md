@@ -1,4 +1,6 @@
 # Azure Confidential Compute VM with Platform Managed Key
+
+### **These templates are intended to be used as a reference and should be tested and validated to meet your specific requirements before using in a production environment.**
 </br>
 This template will deploy a defined number of ACC VMs, using a Customer Managed Key in a Azure Key Vault for encryption, along with a new Virtual Network and optional Bastion Host.
 </br></br>
