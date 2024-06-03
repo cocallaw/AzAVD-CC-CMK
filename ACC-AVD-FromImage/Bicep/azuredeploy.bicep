@@ -39,7 +39,7 @@ param hostpoolName string
 param hostpoolToken string
 param artifactsLocation string = 'https://wvdportalstorageblob.blob.core.windows.net/galleryartifacts/Configuration_1.0.02698.323.zip'
 
-var osDiskType = 'Standard_LRS'
+var osDiskType = 'StandardSSD_LRS'
 var osDiskDeleteOption = 'Detach'
 var nicDeleteOption = 'Detach'
 var patchMode = 'AutomaticByOS'
