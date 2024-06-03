@@ -66,6 +66,10 @@
         "hostpoolToken": {
             "type": "secureString"
         },
+        "intune": {
+            "type": "bool",
+            "defaultValue": true
+        },
         "artifactsLocation" : {
             "type": "string",
             "defaultValue" : "https://wvdportalstorageblob.blob.core.windows.net/galleryartifacts/Configuration_1.0.02698.323.zip"
@@ -79,7 +83,6 @@
         "aadLoginExtensionName": "AADLoginForWindows",
         "aadJoin": true,
         "enableHotpatching": false,
-        "intune": false,
         "securityType" : "ConfidentialVM",
         "aadJoinPreview": false
     },
@@ -239,7 +242,7 @@
                         "aadJoin": "[variables('aadJoin')]",
                         "UseAgentDownloadEndpoint": true,
                         "aadJoinPreview": "[variables('aadJoinPreview')]",
-                        "mdmId": "[if(variables('intune'), '0000000a-0000-0000-c000-000000000000', '')]",
+                        "mdmId": "[if(parameters('intune'), '0000000a-0000-0000-c000-000000000000', '')]",
                         "sessionHostConfigurationLastUpdateTime": ""
                     }
                 },
@@ -268,7 +271,7 @@
                 "type": "AADLoginForWindows",
                 "typeHandlerVersion": "2.0",
                 "autoUpgradeMinorVersion": true,
-                "settings": "[if(variables('intune'), createObject('mdmId','0000000a-0000-0000-c000-000000000000'), json('null'))]"
+                "settings": "[if(parameters('intune'), createObject('mdmId','0000000a-0000-0000-c000-000000000000'), json('null'))]"
             },
             "dependsOn": [
                 "VM-DSCLoop"
