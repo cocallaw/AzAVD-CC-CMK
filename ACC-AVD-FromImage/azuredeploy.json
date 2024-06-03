@@ -72,7 +72,7 @@
         }
     },
     "variables": {
-        "osDiskType": "Standard_LRS",
+        "osDiskType": "StandardSSD_LRS",
         "osDiskDeleteOption": "Detach",
         "nicDeleteOption": "Detach",
         "patchMode" : "AutomaticByOS",
