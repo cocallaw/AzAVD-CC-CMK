@@ -37,6 +37,7 @@ param hostpoolName string
 
 @secure()
 param hostpoolToken string
+param intune bool = true
 param artifactsLocation string = 'https://wvdportalstorageblob.blob.core.windows.net/galleryartifacts/Configuration_1.0.02698.323.zip'
 
 var osDiskType = 'StandardSSD_LRS'
@@ -46,7 +47,6 @@ var patchMode = 'AutomaticByOS'
 var aadLoginExtensionName = 'AADLoginForWindows'
 var aadJoin = true
 var enableHotpatching = false
-var intune = false
 var securityType = 'ConfidentialVM'
 var aadJoinPreview = false
 
