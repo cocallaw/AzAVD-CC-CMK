@@ -79,7 +79,6 @@
             "type": "bool",
             "defaultValue": true
         },
-        "artifactsLocation" : {
             "type": "string",
             "defaultValue" : "https://wvdportalstorageblob.blob.core.windows.net/galleryartifacts/Configuration_1.0.02698.323.zip"
         }
@@ -88,8 +87,7 @@
         "osDiskType": "StandardSSD_LRS",
         "osDiskDeleteOption": "Detach",
         "nicDeleteOption": "Detach",
-        "patchMode" : "AutomaticByOS",
-        "aadLoginExtensionName": "AADLoginForWindows",
+        "patchMode": "AutomaticByOS",
         "aadJoin": true,
         "enableHotpatching": false,
         "securityType" : "ConfidentialVM",
