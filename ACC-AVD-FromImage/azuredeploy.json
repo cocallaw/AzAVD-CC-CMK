@@ -101,7 +101,7 @@
                 "name": "NIC-Loop",
                 "count": "[length(range(1, parameters('numberOfVMs')))]"
             },
-            "name": "[format('{0}-nic-{1}', parameters('virtualMachineName'), range(0, parameters('numberOfVMs'))[copyIndex()])]",
+            "name": "[format('{0}-nic-{1}', parameters('virtualMachineName'), add(range(1, parameters('numberOfVMs'))[copyIndex()], parameters('existingNumberofVMs')))]",
             "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "2022-11-01",
             "location": "[resourceGroup().location]",
@@ -125,7 +125,7 @@
                 "name": "VM-Loop",
                 "count": "[length(range(1, parameters('numberOfVMs')))]"
             },
-            "name": "[format('{0}-{1}', parameters('virtualMachineName'), range(0, parameters('numberOfVMs'))[copyIndex()])]",
+            "name": "[format('{0}-{1}', parameters('virtualMachineName'), add(range(1, parameters('numberOfVMs'))[copyIndex()], parameters('existingNumberofVMs')))]",
             "type": "Microsoft.Compute/virtualMachines",
             "apiVersion": "2024-03-01",
             "location": "[resourceGroup().location]",
@@ -157,7 +157,7 @@
                 "networkProfile": {
                     "networkInterfaces": [
                         {
-                            "id": "[resourceId('Microsoft.Network/networkInterfaces', format('{0}-nic-{1}', parameters('virtualMachineName'), range(0, parameters('numberOfVMs'))[copyIndex()]))]",
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', format('{0}-nic-{1}', parameters('virtualMachineName'), add(range(1, parameters('numberOfVMs'))[copyIndex()], parameters('existingNumberofVMs'))))]",
                             "properties": {
                                 "deleteOption": "[variables('nicDeleteOption')]"
                             }
@@ -168,7 +168,7 @@
                     "hibernationEnabled": false
                 },
                 "osProfile": {
-                    "computerName": "[format('{0}-{1}', parameters('virtualMachineName'), range(0, parameters('numberOfVMs'))[copyIndex()])]",
+                    "computerName": "[format('{0}-{1}', parameters('virtualMachineName'), add(range(1, parameters('numberOfVMs'))[copyIndex()], parameters('existingNumberofVMs')))]",
                     "adminUsername": "[parameters('adminUsername')]",
                     "adminPassword": "[parameters('adminPassword')]",
                     "windowsConfiguration": {
@@ -196,7 +196,7 @@
         {
             "type": "Microsoft.Compute/virtualMachines/extensions",
             "apiVersion": "2018-10-01",
-            "name": "[concat(format('{0}-{1}', parameters('virtualMachineName'), range(0, parameters('numberOfVMs'))[copyIndex()]),'/GuestAttestation')]",
+            "name": "[concat(format('{0}-{1}', parameters('virtualMachineName'), add(range(1, parameters('numberOfVMs'))[copyIndex()], parameters('existingNumberofVMs'))),'/GuestAttestation')]",
             "location": "[resourceGroup().location]",
             "dependsOn": [
                 "VM-Loop"
@@ -229,7 +229,7 @@
         {
             "type": "Microsoft.Compute/virtualMachines/extensions",
             "apiVersion": "2021-07-01",
-            "name": "[concat(format('{0}-{1}', parameters('virtualMachineName'), range(0, parameters('numberOfVMs'))[copyIndex()]), '/', 'Microsoft.PowerShell.DSC')]",
+            "name": "[concat(format('{0}-{1}', parameters('virtualMachineName'), add(range(1, parameters('numberOfVMs'))[copyIndex()], parameters('existingNumberofVMs'))), '/Microsoft.PowerShell.DSC')]",
             "location": "[resourceGroup().location]",
             "dependsOn": [
                 "VM-attestation-loop"
@@ -271,7 +271,7 @@
                 "name": "AADLoginExtension-Loop",
                 "count": "[length(range(1, parameters('numberOfVMs')))]"
             },
-            "name": "[concat(format('{0}-{1}', parameters('virtualMachineName'), range(0, parameters('numberOfVMs'))[copyIndex()]),'/', variables('aadLoginExtensionName'))]",
+            "name": "[concat(format('{0}-{1}', parameters('virtualMachineName'), add(range(1, parameters('numberOfVMs'))[copyIndex()], parameters('existingNumberofVMs'))), '/AADLoginForWindows')]",
             "type": "Microsoft.Compute/virtualMachines/extensions",
             "apiVersion": "2021-07-01",
             "location": "[resourceGroup().location]",
