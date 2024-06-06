@@ -90,7 +90,7 @@
         {
             "copy": {
                 "name": "NIC-Loop",
-                "count": "[length(range(0, parameters('numberOfVMs')))]"
+                "count": "[length(range(1, parameters('numberOfVMs')))]"
             },
             "name": "[format('{0}-nic-{1}', parameters('virtualMachineName'), range(0, parameters('numberOfVMs'))[copyIndex()])]",
             "type": "Microsoft.Network/networkInterfaces",
@@ -114,7 +114,7 @@
         {
             "copy": {
                 "name": "VM-Loop",
-                "count": "[length(range(0, parameters('numberOfVMs')))]"
+                "count": "[length(range(1, parameters('numberOfVMs')))]"
             },
             "name": "[format('{0}-{1}', parameters('virtualMachineName'), range(0, parameters('numberOfVMs'))[copyIndex()])]",
             "type": "Microsoft.Compute/virtualMachines",
@@ -214,7 +214,7 @@
             },
             "copy": {
                 "name": "VM-attestation-loop",
-                "count": "[parameters('numberOfVMs')]"
+                "count": "[length(range(1, parameters('numberOfVMs')))]"
             }
         },
         {
@@ -254,13 +254,13 @@
             },
             "copy": {
                 "name": "VM-DSCLoop",
-                "count": "[parameters('numberOfVMs')]"
+                "count": "[length(range(1, parameters('numberOfVMs')))]"
             }
         },
         {
             "copy": {
                 "name": "AADLoginExtension-Loop",
-                "count": "[length(range(0, parameters('numberOfVMs')))]"
+                "count": "[length(range(1, parameters('numberOfVMs')))]"
             },
             "name": "[concat(format('{0}-{1}', parameters('virtualMachineName'), range(0, parameters('numberOfVMs'))[copyIndex()]),'/', variables('aadLoginExtensionName'))]",
             "type": "Microsoft.Compute/virtualMachines/extensions",
