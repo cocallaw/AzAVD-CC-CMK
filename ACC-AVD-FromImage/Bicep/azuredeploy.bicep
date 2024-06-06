@@ -87,6 +87,7 @@ resource virtualMachineName_0_numberOfVMs 'Microsoft.Compute/virtualMachines@202
       }
       storageProfile: {
         osDisk: {
+          name: '${virtualMachineName}-osdisk-${range(0,numberOfVMs)[i]}'
           createOption: 'fromImage'
           managedDisk: {
             storageAccountType: osDiskType
