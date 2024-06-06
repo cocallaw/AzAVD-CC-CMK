@@ -11,6 +11,15 @@
                 "description": "Number of VMs to deploy"
             }
         },
+        "existingNumberofVMs": {
+            "type": "int",
+            "defaultValue": 1,
+            "maxValue": 50,
+            "minValue": 1,
+            "metadata": {
+                "description": "Number of Existing VMs in the hostpool"
+            }
+        },
         "virtualNetworkSubscriptionId": {
             "type": "string"
         },
