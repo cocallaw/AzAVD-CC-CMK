@@ -79,8 +79,9 @@
             "type": "bool",
             "defaultValue": true
         },
+        "artifactsLocation": {
             "type": "string",
-            "defaultValue" : "https://wvdportalstorageblob.blob.core.windows.net/galleryartifacts/Configuration_1.0.02698.323.zip"
+            "defaultValue": "https://wvdportalstorageblob.blob.core.windows.net/galleryartifacts/Configuration_1.0.02698.323.zip"
         }
     },
     "variables": {
@@ -90,7 +91,7 @@
         "patchMode": "AutomaticByOS",
         "aadJoin": true,
         "enableHotpatching": false,
-        "securityType" : "ConfidentialVM",
+        "securityType": "ConfidentialVM",
         "aadJoinPreview": false
     },
     "resources": [
