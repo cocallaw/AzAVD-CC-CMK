@@ -13,9 +13,9 @@
         },
         "existingNumberofVMs": {
             "type": "int",
-            "defaultValue": 1,
+            "defaultValue": 0,
             "maxValue": 50,
-            "minValue": 1,
+            "minValue": 0,
             "metadata": {
                 "description": "Number of Existing VMs in the hostpool"
             }
