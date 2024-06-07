@@ -1,7 +1,12 @@
 @description('Number of VMs to deploy')
 @minValue(1)
-@maxValue(50)
+@maxValue(250)
 param numberOfVMs int = 1
+
+@description('Number of Existing VMs in the hostpool')
+@minValue(0)
+@maxValue(5000)
+param existingNumberofVMs int = 0
 param virtualNetworkSubscriptionId string
 param virtualNetworkRG string
 param virtualNetworkName string
@@ -44,15 +49,14 @@ var osDiskType = 'StandardSSD_LRS'
 var osDiskDeleteOption = 'Detach'
 var nicDeleteOption = 'Detach'
 var patchMode = 'AutomaticByOS'
-var aadLoginExtensionName = 'AADLoginForWindows'
 var aadJoin = true
 var enableHotpatching = false
 var securityType = 'ConfidentialVM'
 var aadJoinPreview = false
 
-resource virtualMachineName_nic_0_numberOfVMs 'Microsoft.Network/networkInterfaces@2022-11-01' = [
-  for i in range(0, length(range(0, numberOfVMs))): {
-    name: '${virtualMachineName}-nic-${range(0,numberOfVMs)[i]}'
+resource virtualMachineName_nic_1_numberOfVMs_existingNumberofVMs 'Microsoft.Network/networkInterfaces@2022-11-01' = [
+  for i in range(0, length(range(1, numberOfVMs))): {
+    name: '${virtualMachineName}-nic-${(range(1,numberOfVMs)[i]+existingNumberofVMs)}'
     location: resourceGroup().location
     properties: {
       ipConfigurations: [
@@ -77,9 +81,9 @@ resource virtualMachineName_nic_0_numberOfVMs 'Microsoft.Network/networkInterfac
   }
 ]
 
-resource virtualMachineName_0_numberOfVMs 'Microsoft.Compute/virtualMachines@2024-03-01' = [
-  for i in range(0, length(range(0, numberOfVMs))): {
-    name: '${virtualMachineName}-${range(0,numberOfVMs)[i]}'
+resource virtualMachineName_1_numberOfVMs_existingNumberofVMs 'Microsoft.Compute/virtualMachines@2024-03-01' = [
+  for i in range(0, length(range(1, numberOfVMs))): {
+    name: '${virtualMachineName}-${(range(1,numberOfVMs)[i]+existingNumberofVMs)}'
     location: resourceGroup().location
     properties: {
       hardwareProfile: {
@@ -87,6 +91,7 @@ resource virtualMachineName_0_numberOfVMs 'Microsoft.Compute/virtualMachines@202
       }
       storageProfile: {
         osDisk: {
+          name: '${virtualMachineName}-osdisk-${(range(1,numberOfVMs)[i]+existingNumberofVMs)}'
           createOption: 'fromImage'
           managedDisk: {
             storageAccountType: osDiskType
@@ -108,7 +113,7 @@ resource virtualMachineName_0_numberOfVMs 'Microsoft.Compute/virtualMachines@202
           {
             id: resourceId(
               'Microsoft.Network/networkInterfaces',
-              '${virtualMachineName}-nic-${range(0,numberOfVMs)[i]}'
+              '${virtualMachineName}-nic-${(range(1,numberOfVMs)[i]+existingNumberofVMs)}'
             )
             properties: {
               deleteOption: nicDeleteOption
@@ -120,7 +125,7 @@ resource virtualMachineName_0_numberOfVMs 'Microsoft.Compute/virtualMachines@202
         hibernationEnabled: false
       }
       osProfile: {
-        computerName: '${virtualMachineName}-${range(0,numberOfVMs)[i]}'
+        computerName: '${virtualMachineName}-${(range(1,numberOfVMs)[i]+existingNumberofVMs)}'
         adminUsername: adminUsername
         adminPassword: adminPassword
         windowsConfiguration: {
@@ -145,14 +150,14 @@ resource virtualMachineName_0_numberOfVMs 'Microsoft.Compute/virtualMachines@202
       type: 'SystemAssigned'
     }
     dependsOn: [
-      virtualMachineName_nic_0_numberOfVMs
+      virtualMachineName_nic_1_numberOfVMs_existingNumberofVMs
     ]
   }
 ]
 
-resource virtualMachineName_0_numberOfVMs_GuestAttestation 'Microsoft.Compute/virtualMachines/extensions@2018-10-01' = [
-  for i in range(0, numberOfVMs): {
-    name: '${virtualMachineName}-${range(0,numberOfVMs)[i]}/GuestAttestation'
+resource virtualMachineName_1_numberOfVMs_existingNumberofVMs_GuestAttestation 'Microsoft.Compute/virtualMachines/extensions@2018-10-01' = [
+  for i in range(0, length(range(1, numberOfVMs))): {
+    name: '${virtualMachineName}-${(range(1,numberOfVMs)[i]+existingNumberofVMs)}/GuestAttestation'
     location: resourceGroup().location
     properties: {
       publisher: 'Microsoft.Azure.Security.WindowsAttestation'
@@ -175,14 +180,14 @@ resource virtualMachineName_0_numberOfVMs_GuestAttestation 'Microsoft.Compute/vi
       }
     }
     dependsOn: [
-      virtualMachineName_0_numberOfVMs
+      virtualMachineName_1_numberOfVMs_existingNumberofVMs
     ]
   }
 ]
 
-resource virtualMachineName_0_numberOfVMs_Microsoft_PowerShell_DSC 'Microsoft.Compute/virtualMachines/extensions@2021-07-01' = [
-  for i in range(0, numberOfVMs): {
-    name: '${virtualMachineName}-${range(0,numberOfVMs)[i]}/Microsoft.PowerShell.DSC'
+resource virtualMachineName_1_numberOfVMs_existingNumberofVMs_Microsoft_PowerShell_DSC 'Microsoft.Compute/virtualMachines/extensions@2021-07-01' = [
+  for i in range(0, length(range(1, numberOfVMs))): {
+    name: '${virtualMachineName}-${(range(1,numberOfVMs)[i]+existingNumberofVMs)}/Microsoft.PowerShell.DSC'
     location: resourceGroup().location
     properties: {
       publisher: 'Microsoft.Powershell'
@@ -212,14 +217,14 @@ resource virtualMachineName_0_numberOfVMs_Microsoft_PowerShell_DSC 'Microsoft.Co
       }
     }
     dependsOn: [
-      virtualMachineName_0_numberOfVMs_GuestAttestation
+      virtualMachineName_1_numberOfVMs_existingNumberofVMs_GuestAttestation
     ]
   }
 ]
 
-resource virtualMachineName_0_numberOfVMs_aadLoginExtension 'Microsoft.Compute/virtualMachines/extensions@2021-07-01' = [
-  for i in range(0, length(range(0, numberOfVMs))): {
-    name: '${virtualMachineName}-${range(0,numberOfVMs)[i]}/${aadLoginExtensionName}'
+resource virtualMachineName_1_numberOfVMs_existingNumberofVMs_AADLoginForWindows 'Microsoft.Compute/virtualMachines/extensions@2021-07-01' = [
+  for i in range(0, length(range(1, numberOfVMs))): {
+    name: '${virtualMachineName}-${(range(1,numberOfVMs)[i]+existingNumberofVMs)}/AADLoginForWindows'
     location: resourceGroup().location
     properties: {
       publisher: 'Microsoft.Azure.ActiveDirectory'
@@ -233,7 +238,7 @@ resource virtualMachineName_0_numberOfVMs_aadLoginExtension 'Microsoft.Compute/v
         : json('null'))
     }
     dependsOn: [
-      virtualMachineName_0_numberOfVMs_Microsoft_PowerShell_DSC
+      virtualMachineName_1_numberOfVMs_existingNumberofVMs_Microsoft_PowerShell_DSC
     ]
   }
 ]
