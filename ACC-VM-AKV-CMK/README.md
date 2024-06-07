@@ -1,4 +1,4 @@
-# Azure Confidential Compute VM with Platform Managed Key
+# Azure Confidential Compute VM with Customer Managed Key
 
 ### **These templates are intended to be used as a reference and should be tested and validated to meet your specific requirements before using in a production environment.**
 </br>
