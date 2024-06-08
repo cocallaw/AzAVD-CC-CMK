@@ -5,10 +5,19 @@
         "numberOfVMs": {
             "type": "int",
             "defaultValue": 1,
-            "maxValue": 50,
+            "maxValue": 250,
             "minValue": 1,
             "metadata": {
                 "description": "Number of VMs to deploy"
+            }
+        },
+        "existingNumberofVMs": {
+            "type": "int",
+            "defaultValue": 0,
+            "maxValue": 5000,
+            "minValue": 0,
+            "metadata": {
+                "description": "Number of Existing VMs in the hostpool"
             }
         },
         "virtualNetworkSubscriptionId": {
@@ -70,29 +79,28 @@
             "type": "bool",
             "defaultValue": true
         },
-        "artifactsLocation" : {
+        "artifactsLocation": {
             "type": "string",
-            "defaultValue" : "https://wvdportalstorageblob.blob.core.windows.net/galleryartifacts/Configuration_1.0.02698.323.zip"
+            "defaultValue": "https://wvdportalstorageblob.blob.core.windows.net/galleryartifacts/Configuration_1.0.02698.323.zip"
         }
     },
     "variables": {
         "osDiskType": "StandardSSD_LRS",
         "osDiskDeleteOption": "Detach",
         "nicDeleteOption": "Detach",
-        "patchMode" : "AutomaticByOS",
-        "aadLoginExtensionName": "AADLoginForWindows",
+        "patchMode": "AutomaticByOS",
         "aadJoin": true,
         "enableHotpatching": false,
-        "securityType" : "ConfidentialVM",
+        "securityType": "ConfidentialVM",
         "aadJoinPreview": false
     },
     "resources": [
         {
             "copy": {
                 "name": "NIC-Loop",
-                "count": "[length(range(0, parameters('numberOfVMs')))]"
+                "count": "[length(range(1, parameters('numberOfVMs')))]"
             },
-            "name": "[format('{0}-nic-{1}', parameters('virtualMachineName'), range(0, parameters('numberOfVMs'))[copyIndex()])]",
+            "name": "[format('{0}-nic-{1}', parameters('virtualMachineName'), add(range(1, parameters('numberOfVMs'))[copyIndex()], parameters('existingNumberofVMs')))]",
             "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "2022-11-01",
             "location": "[resourceGroup().location]",
@@ -114,9 +122,9 @@
         {
             "copy": {
                 "name": "VM-Loop",
-                "count": "[length(range(0, parameters('numberOfVMs')))]"
+                "count": "[length(range(1, parameters('numberOfVMs')))]"
             },
-            "name": "[format('{0}-{1}', parameters('virtualMachineName'), range(0, parameters('numberOfVMs'))[copyIndex()])]",
+            "name": "[format('{0}-{1}', parameters('virtualMachineName'), add(range(1, parameters('numberOfVMs'))[copyIndex()], parameters('existingNumberofVMs')))]",
             "type": "Microsoft.Compute/virtualMachines",
             "apiVersion": "2024-03-01",
             "location": "[resourceGroup().location]",
@@ -129,7 +137,7 @@
                 },
                 "storageProfile": {
                     "osDisk": {
-                        "name": "[format('{0}-osdisk-{1}', parameters('virtualMachineName'), range(0, parameters('numberOfVMs'))[copyIndex()])]",
+                        "name": "[format('{0}-osdisk-{1}', parameters('virtualMachineName'), add(range(1, parameters('numberOfVMs'))[copyIndex()], parameters('existingNumberofVMs')))]",
                         "createOption": "fromImage",
                         "managedDisk": {
                             "storageAccountType": "[variables('osDiskType')]",
@@ -149,7 +157,7 @@
                 "networkProfile": {
                     "networkInterfaces": [
                         {
-                            "id": "[resourceId('Microsoft.Network/networkInterfaces', format('{0}-nic-{1}', parameters('virtualMachineName'), range(0, parameters('numberOfVMs'))[copyIndex()]))]",
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', format('{0}-nic-{1}', parameters('virtualMachineName'), add(range(1, parameters('numberOfVMs'))[copyIndex()], parameters('existingNumberofVMs'))))]",
                             "properties": {
                                 "deleteOption": "[variables('nicDeleteOption')]"
                             }
@@ -160,7 +168,7 @@
                     "hibernationEnabled": false
                 },
                 "osProfile": {
-                    "computerName": "[format('{0}-{1}', parameters('virtualMachineName'), range(0, parameters('numberOfVMs'))[copyIndex()])]",
+                    "computerName": "[format('{0}-{1}', parameters('virtualMachineName'), add(range(1, parameters('numberOfVMs'))[copyIndex()], parameters('existingNumberofVMs')))]",
                     "adminUsername": "[parameters('adminUsername')]",
                     "adminPassword": "[parameters('adminPassword')]",
                     "windowsConfiguration": {
@@ -188,7 +196,7 @@
         {
             "type": "Microsoft.Compute/virtualMachines/extensions",
             "apiVersion": "2018-10-01",
-            "name": "[concat(format('{0}-{1}', parameters('virtualMachineName'), range(0, parameters('numberOfVMs'))[copyIndex()]),'/GuestAttestation')]",
+            "name": "[concat(format('{0}-{1}', parameters('virtualMachineName'), add(range(1, parameters('numberOfVMs'))[copyIndex()], parameters('existingNumberofVMs'))),'/GuestAttestation')]",
             "location": "[resourceGroup().location]",
             "dependsOn": [
                 "VM-Loop"
@@ -215,13 +223,13 @@
             },
             "copy": {
                 "name": "VM-attestation-loop",
-                "count": "[parameters('numberOfVMs')]"
+                "count": "[length(range(1, parameters('numberOfVMs')))]"
             }
         },
         {
             "type": "Microsoft.Compute/virtualMachines/extensions",
             "apiVersion": "2021-07-01",
-            "name": "[concat(format('{0}-{1}', parameters('virtualMachineName'), range(0, parameters('numberOfVMs'))[copyIndex()]), '/', 'Microsoft.PowerShell.DSC')]",
+            "name": "[concat(format('{0}-{1}', parameters('virtualMachineName'), add(range(1, parameters('numberOfVMs'))[copyIndex()], parameters('existingNumberofVMs'))), '/Microsoft.PowerShell.DSC')]",
             "location": "[resourceGroup().location]",
             "dependsOn": [
                 "VM-attestation-loop"
@@ -255,15 +263,15 @@
             },
             "copy": {
                 "name": "VM-DSCLoop",
-                "count": "[parameters('numberOfVMs')]"
+                "count": "[length(range(1, parameters('numberOfVMs')))]"
             }
         },
         {
             "copy": {
                 "name": "AADLoginExtension-Loop",
-                "count": "[length(range(0, parameters('numberOfVMs')))]"
+                "count": "[length(range(1, parameters('numberOfVMs')))]"
             },
-            "name": "[concat(format('{0}-{1}', parameters('virtualMachineName'), range(0, parameters('numberOfVMs'))[copyIndex()]),'/', variables('aadLoginExtensionName'))]",
+            "name": "[concat(format('{0}-{1}', parameters('virtualMachineName'), add(range(1, parameters('numberOfVMs'))[copyIndex()], parameters('existingNumberofVMs'))), '/AADLoginForWindows')]",
             "type": "Microsoft.Compute/virtualMachines/extensions",
             "apiVersion": "2021-07-01",
             "location": "[resourceGroup().location]",
