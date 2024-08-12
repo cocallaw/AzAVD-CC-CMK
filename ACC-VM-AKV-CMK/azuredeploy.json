@@ -417,6 +417,7 @@
                       "permissions": {
                         "keys": [
                           "get",
+                          "list",
                           "wrapKey",
                           "unwrapKey"
                         ],

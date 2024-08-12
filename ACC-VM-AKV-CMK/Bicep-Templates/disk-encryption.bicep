@@ -90,6 +90,7 @@ resource keyvaultName_add 'Microsoft.KeyVault/vaults/accessPolicies@2021-11-01-p
         permissions: {
           keys: [
             'get'
+            'list'
             'wrapKey'
             'unwrapKey'
           ]
